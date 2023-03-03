@@ -3,16 +3,16 @@
 #[serde(default)] // if we add new fields, give them default values when deserializing old state
 
 pub struct TemplateApp {
-    label: String,
     #[serde(skip)]
-    value: f32,
+    energy: f64,
+    magic: f64,
 }
 
 impl Default for TemplateApp {
     fn default() -> Self {
         Self {
-            label: "Hello World!".to_owned(),
-            value: 2.7,
+            energy: 37500.0,
+            magic: 10000.0,
         }
     }
 }
@@ -32,91 +32,45 @@ impl eframe::App for TemplateApp {
     }
 
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-        let Self { label, value } = self;
+        let Self { energy, magic } = self;
 
         #[cfg(not(target_arch = "wasm32"))] // no File->Quit on web pages!
 
-        egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
+        egui::TopBottomPanel::top("Title").show(ctx, |ui| {
             ui.with_layout(egui::Layout::top_down(egui::Align::Center),|ui|{
-                ui.heading("NGU Calculator");
+                ui.heading("NGU Ratio Calculator");
             })
         });
 
-        egui::SidePanel::left("side_panel").show(ctx, |ui| {
-            ui.heading("Side Panel");
-
-            ui.horizontal(|ui| {
-                ui.label("Write something: ");
-                ui.text_edit_singleline(label);
-            });
-
-            ui.add(egui::Slider::new(value, 0.0..=10.0).text("value"));
-            if ui.button("Increment").clicked() {
-                *value += 1.0;
-            }
-
-            ui.with_layout(egui::Layout::bottom_up(egui::Align::LEFT), |ui| {
-                ui.horizontal(|ui| {
-                    ui.spacing_mut().item_spacing.x = 0.0;
-                    ui.label("powered by ");
-                    ui.hyperlink_to("egui", "https://github.com/emilk/egui");
-                    ui.label(" and ");
-                    ui.hyperlink_to(
-                        "eframe",
-                        "https://github.com/emilk/egui/tree/master/crates/eframe",
-                    );
-                    ui.label(".");
-                });
-            });
-        });
-        
-        egui::SidePanel::left("side_panel_2").show(ctx, |ui| {
-            ui.heading("Side Panel");
-
-            ui.horizontal(|ui| {
-                ui.label("Write something: ");
-                ui.text_edit_singleline(label);
-            });
-
-            ui.add(egui::Slider::new(value, 0.0..=10.0).text("value"));
-            if ui.button("Increment").clicked() {
-                *value += 1.0;
-            }
-
-            ui.with_layout(egui::Layout::bottom_up(egui::Align::LEFT), |ui| {
-                ui.horizontal(|ui| {
-                    ui.spacing_mut().item_spacing.x = 0.0;
-                    ui.label("powered by ");
-                    ui.hyperlink_to("egui", "https://github.com/emilk/egui");
-                    ui.label(" and ");
-                    ui.hyperlink_to(
-                        "eframe",
-                        "https://github.com/emilk/egui/tree/master/crates/eframe",
-                    );
-                    ui.label(".");
-                });
-            });
-        });
-        
-
         egui::CentralPanel::default().show(ctx, |ui| {
+            ui.with_layout(egui::Layout::top_down(egui::Align::Center),|ui|{
+                
+                ui.heading("Energy / Magic Cap");
+    
+                ui.horizontal(|ui| {
+                    ui.label("Energy ");
+                    ui.add(egui::Slider::new(energy, 0.0..=9999999999.9).text("value"))
+                });
+                ui.horizontal(|ui| {
+                    ui.label("Magic   ");
+                    ui.add(egui::Slider::new(magic, 0.0..=999999999.9).text("value"))
+                });
+    
+                ui.separator();
+                ui.heading("Power and Bars");
+    
+                ui.horizontal(|ui| {
+                    ui.label("Energy ");
+                    ui.label(format!("{}",*energy/37500.0));
+                });
+                ui.horizontal(|ui| {
+                    ui.label("Magic   ");
+                    ui.label(format!("{}",*magic/10000.0));
+                });
+            })
 
-            ui.heading("eframe template");
-            ui.hyperlink("https://github.com/emilk/eframe_template");
-            ui.add(egui::github_link_file!(
-                "https://github.com/emilk/eframe_template/blob/master/",
-                "Source code."
-            ));
-            egui::warn_if_debug_build(ui);
+
         });
 
-        if false {
-            egui::Window::new("Window").show(ctx, |ui| {
-                ui.label("Windows can be moved by dragging them.");
-                ui.label("They are automatically sized based on contents.");
-                ui.label("You can turn on resizing and scrolling if you like.");
-                ui.label("You would normally choose either panels OR windows.");
-            });
-        }
     }
 }
